@@ -11,26 +11,28 @@ Twitch Chat Analyzer is a Python project that connects to the Twitch API, pulls 
 
 ## Project Structure
 
+```plaintext
 twitch-chat-analyzer/
 ├── twitch_chat_analyzer/
-│ ├── init.py
-│ ├── config.py
-│ ├── main.py
-│ ├── db/
-│ │ ├── init.py
-│ │ ├── db_manager.py
-│ │ ├── chat_messages.db # Database file
-│ ├── twitch/
-│ │ ├── init.py
-│ │ ├── auth_url.py
-│ │ ├── bot.py
-│ │ ├── get_refresh_token.py
-│ │ ├── token_manager.py
+│   ├── __init__.py
+│   ├── config.py
+│   ├── main.py
+│   ├── db/
+│   │   ├── __init__.py
+│   │   ├── db_manager.py
+│   │   └── chat_messages.db  # Database file
+│   ├── twitch/
+│   │   ├── __init__.py
+│   │   ├── auth_url.py
+│   │   ├── bot.py
+│   │   ├── get_refresh_token.py
+│   │   └── token_manager.py
 ├── venv/
 ├── .env
 ├── setup.py
 ├── README.md
-├── requirements.txt
+└── requirements.txt
+```
 
 
 ## Getting Started
