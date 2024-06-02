@@ -1,37 +1,72 @@
-import sqlite3
+from datetime import datetime, timezone
+import boto3
+from botocore.exceptions import NoCredentialsError, PartialCredentialsError
+from boto3.dynamodb.conditions import Key
+from dotenv import load_dotenv
 import os
 
-DB_PATH = os.path.join(os.path.dirname(__file__), 'chat_messages.db')
+class DBManager:
+    def __init__(self):
+        # Load environment variables from .env file
+        load_dotenv()
+        self._aws_access_key_id = os.getenv('AWS_ACCESS_KEY_ID')
+        self._aws_secret_access_key = os.getenv('AWS_SECRET_ACCESS_KEY')
+        self._aws_region = os.getenv('AWS_REGION')
+        self._table_name = os.getenv('DYNAMODB_TABLE_NAME')
 
-def initialize_db(db_path=DB_PATH):
-    try:
-        conn = sqlite3.connect(db_path)
-        c = conn.cursor()
-        c.execute('''
-            CREATE TABLE IF NOT EXISTS messages (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                username TEXT NOT NULL,
-                message TEXT NOT NULL,
-                channel TEXT NOT NULL,
-                timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
+        # Initialize DynamoDB resource
+        self._dynamodb = boto3.resource(
+            'dynamodb',
+            region_name=self._aws_region,
+            aws_access_key_id=self._aws_access_key_id,
+            aws_secret_access_key=self._aws_secret_access_key
+        )
+        self._table = self._dynamodb.Table(self._table_name)
+
+    def write_chat_log(self, channel_id, user, message, timestamp):
+        try:
+            timestamp_user = f"{timestamp}::{user}"
+            response = self._table.put_item(
+                Item={
+                    'channel_id': channel_id,
+                    'timestamp_user': timestamp_user,
+                    'timestamp': timestamp,
+                    'user': user,
+                    'message': message,
+                }
             )
-        ''')
-        conn.commit()
-    except sqlite3.Error as e:
-        print(f"Database initialization error: {e}")
-    finally:
-        conn.close()
+            return response
+        except (NoCredentialsError, PartialCredentialsError) as e:
+            print(f"Credentials not available: {e}")
+            return None
+        except Exception as e:
+            print(f"Error writing to DynamoDB: {e}")
+            return None
 
-def save_message_to_db(username, message, channel, db_path=DB_PATH):
-    try:
-        conn = sqlite3.connect(db_path)
-        c = conn.cursor()
-        c.execute('''
-            INSERT INTO messages (username, message, channel)
-            VALUES (?, ?, ?)
-        ''', (username, message, channel))
-        conn.commit()
-    except sqlite3.Error as e:
-        print(f"Database error: {e}")
-    finally:
-        conn.close()
+    def query_chat_logs(self, channel_id, start_time, end_time):
+        try:
+            response = self._table.query(
+                KeyConditionExpression=Key('channel_id').eq(channel_id) & 
+                                       Key('timestamp_user').between(start_time, end_time)
+            )
+            return response['Items']
+        except Exception as e:
+            print(f"Error querying DynamoDB: {e}")
+            return None
+
+# Example usage
+if __name__ == "__main__":
+    db_manager = DBManager()
+    current_timestamp = datetime.now(timezone.utc).isoformat()  # ISO 8601 format with timezone
+    db_manager.write_chat_log('channel_123', 'user_abc', 'Hello, World!', current_timestamp)
+
+    # Example query
+    start_time = '2024-06-02T00:00:00+00:00::'
+    end_time = '2024-06-02T23:59:59+00:00::'
+    logs = db_manager.query_chat_logs('channel_123', start_time, end_time)
+    
+    if logs is not None:
+        for log in logs:
+            print(log)
+    else:
+        print("No logs found or an error occurred.")

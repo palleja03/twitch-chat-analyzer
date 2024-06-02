@@ -1,6 +1,7 @@
 from twitchio.ext import commands
 from random import randint
-from db.db_manager import save_message_to_db
+from datetime import datetime, timezone
+from db.db_manager import DBManager
 from twitch.token_manager import refresh_access_token, validate_token
 from config import CLIENT_ID, CLIENT_SECRET, REFRESH_TOKEN, INITIAL_CHANNELS, NICK
 
@@ -18,6 +19,7 @@ class Bot(commands.Bot):
             prefix='$$',
             initial_channels=INITIAL_CHANNELS
         )
+        self.dbManager = DBManager()
 
     async def event_ready(self):
         print(f'Logged in as | {self.nick}')
@@ -26,7 +28,11 @@ class Bot(commands.Bot):
 
     async def event_message(self, message):
         print(f'{message.author.name} in {message.channel.name}: {message.content}')
-        save_message_to_db(message.author.name, message.content, message.channel.name)
+        self.dbManager.write_chat_log(channel_id = message.channel.name, 
+                                      user = message.author.name, 
+                                      message = message.content, 
+                                      timestamp = datetime.now(timezone.utc).isoformat())
+
         await self.handle_commands(message)
 
     # Sample commands

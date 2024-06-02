@@ -19,3 +19,6 @@ venv/
 
 # VS Code settings
 .vscode/
+
+# Ignore initial_channels.txt
+initial_channels.txt
