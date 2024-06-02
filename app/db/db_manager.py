@@ -3,16 +3,17 @@ import boto3
 from botocore.exceptions import NoCredentialsError, PartialCredentialsError
 from boto3.dynamodb.conditions import Key
 from dotenv import load_dotenv
+from config import AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_REGION, DYNAMODB_TABLE_NAME
 import os
 
 class DBManager:
     def __init__(self):
         # Load environment variables from .env file
         load_dotenv()
-        self._aws_access_key_id = os.getenv('AWS_ACCESS_KEY_ID')
-        self._aws_secret_access_key = os.getenv('AWS_SECRET_ACCESS_KEY')
-        self._aws_region = os.getenv('AWS_REGION')
-        self._table_name = os.getenv('DYNAMODB_TABLE_NAME')
+        self._aws_access_key_id = AWS_ACCESS_KEY_ID
+        self._aws_secret_access_key = AWS_SECRET_ACCESS_KEY
+        self._aws_region = AWS_REGION
+        self._table_name = DYNAMODB_TABLE_NAME
 
         # Initialize DynamoDB resource
         self._dynamodb = boto3.resource(

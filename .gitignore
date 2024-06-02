@@ -21,4 +21,4 @@ venv/
 .vscode/
 
 # Ignore initial_channels.txt
-initial_channels.txt
+app/initial_channels.txt

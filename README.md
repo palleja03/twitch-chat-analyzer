@@ -13,7 +13,7 @@ Twitch Chat Analyzer is a Python project that connects to the Twitch API, pulls 
 
 ```plaintext
 twitch-chat-analyzer/
-├── twitch_chat_analyzer/
+├── app/
 │   ├── __init__.py
 │   ├── config.py
 │   ├── main.py
@@ -42,6 +42,7 @@ twitch-chat-analyzer/
 - Python 3.x
 - Twitch account and API credentials
 - [Twitch Token Generator](https://twitchtokengenerator.com/) (optional, for generating refresh tokens)
+- AWS account with DynamoDB
 
 ### Installation
 
@@ -49,7 +50,6 @@ twitch-chat-analyzer/
 
     ```sh
     git clone https://github.com/your-username/twitch-chat-analyzer.git
-    cd twitch-chat-analyzer
     ```
 
 2. **Set up a virtual environment**:
@@ -77,32 +77,61 @@ twitch-chat-analyzer/
     NICK=[your twitch nick]
     ```
 
-### Usage
+5. **Create and configure the `initial_channels.txt` file**:
 
-1. **Initialize the database**:
-
-    The database is automatically initialized when you run the `main.py` script.
-
-2. **Run the bot**:
+    Create a `initial_channels.txt` file in the root directory, or copy the provided `initial_channels.example.txt` and fill in your desired channels:
 
     ```sh
-    python -m twitch_chat_analyzer.main
+    cp initial_channels.example.txt initial_channels.txt
+    ```
+
+    Then edit the `initial_channels.txt` file with the channels you want to join, one per line:
+
+    ```plaintext
+    channel_1
+    channel_2
+    channel_3
+    ```
+
+6. **Set up AWS DynamoDB**:
+
+    Ensure you have an AWS account and set up DynamoDB. You will need to configure AWS credentials which can be stored in environment variables or use AWS IAM roles if deploying on AWS services.
+
+    If using environment variables, ensure the following are set:
+
+    ```sh
+    AWS_ACCESS_KEY_ID=[Your AWS Access Key ID]
+    AWS_SECRET_ACCESS_KEY=[Your AWS Secret Access Key]
+    AWS_REGION=[Your AWS Region]
+    ```
+
+    Alternatively, configure your AWS credentials using the AWS CLI:
+
+    ```sh
+    aws configure
+    ```
+
+6. **Run the application**:
+
+    Start the main application:
+
+    ```sh
+    python main.py
     ```
 
 ### Scripts
 
-- `main.py`: Entry point of the application. Initializes the database and starts the bot.
-- `db_manager.py`: Contains functions to initialize the database and save messages.
+- `main.py`: Entry point of the application. Starts the bot.
+- `db_manager.py`: Contains DBManager class to connect to AWS DynamoDB and save messages.
 - `auth_url.py`: Generates the authorization URL for Twitch API.
 - `get_refresh_token.py`: Script to obtain a refresh token using an authorization code.
 - `token_manager.py`: Contains functions to refresh and validate the access token.
 - `bot.py`: Defines the Twitch bot, its events, and commands.
 
-### Example .env File
 
-```ini
-CLIENT_ID=exampleclientid123
-CLIENT_SECRET=examplesecretkey123
-REFRESH_TOKEN=examplerefreshtoken123
-INITIAL_CHANNELS=channel1,channel2,channel3
-NICK=example_nick
+### Summary of Changes
+
+- Removed references to the local SQLite database.
+- Added instructions for setting up `initial_channels.txt` and `.env`.
+- Updated the need for AWS DynamoDB and appropriate credentials.
+- Simplified the setup instructions by leveraging example configuration files.
