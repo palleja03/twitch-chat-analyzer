@@ -29,7 +29,7 @@ class Bot(commands.Bot):
     async def event_message(self, message):
         print(f'{message.author.name} in {message.channel.name}: {message.content}')
         self.dbManager.write_chat_log(channel_id = message.channel.name, 
-                                      user = message.author.name, 
+                                      user_id = message.author.name, 
                                       message = message.content, 
                                       timestamp = datetime.now(timezone.utc).isoformat())
 
