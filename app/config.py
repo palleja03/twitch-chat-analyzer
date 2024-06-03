@@ -41,8 +41,3 @@ def load_initial_channels(filename):
     with open(file_path, 'r') as file:
         channels = [line.strip() for line in file if line.strip()]
     return channels
-
-INITIAL_CHANNELS = load_initial_channels('initial_channels.txt')
-
-
-

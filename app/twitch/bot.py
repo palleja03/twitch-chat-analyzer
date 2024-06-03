@@ -28,12 +28,18 @@ class Bot(commands.Bot):
 
     async def event_message(self, message):
         print(f'{message.author.name} in {message.channel.name}: {message.content}')
-        self.dbManager.write_chat_log(channel_id = message.channel.name, 
-                                      user = message.author.name, 
-                                      message = message.content, 
-                                      timestamp = datetime.now(timezone.utc).isoformat())
-
+        current_timestamp = datetime.now(timezone.utc).isoformat()  # ISO 8601 format with timezone
+        self.dbManager.buffer_message(
+            channel_id=message.channel.name, 
+            user_id=message.author.name, 
+            message=message.content, 
+            timestamp=current_timestamp
+        )
         await self.handle_commands(message)
+
+    async def close(self):
+        await super().close()  
+        self.dbManager.close()
 
     # Sample commands
     
