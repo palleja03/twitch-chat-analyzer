@@ -27,7 +27,6 @@ class Bot(commands.Bot):
             print(f'Connected to channel: {channel.name}')
 
     async def event_message(self, message):
-        print(f'{message.author.name} in {message.channel.name}: {message.content}')
         self.dbManager.write_chat_log(channel_id = message.channel.name, 
                                       user_id = message.author.name, 
                                       message = message.content, 
