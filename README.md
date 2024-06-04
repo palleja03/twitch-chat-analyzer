@@ -39,7 +39,7 @@ twitch-chat-analyzer/
 
 ### Prerequisites
 
-- Python 3.x
+- Python 3.9.x
 - Twitch account and API credentials
 - [Twitch Token Generator](https://twitchtokengenerator.com/) (optional, for generating refresh tokens)
 - AWS account with DynamoDB
