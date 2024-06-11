@@ -155,10 +155,14 @@ twitch-chat-analyzer/
 - `token_manager.py`: Contains functions to refresh and validate the access token.
 - `bot.py`: Defines the Twitch bot, its events, and commands.
 
+### Discussion: Why Use AWS RDS with MySQL?
 
-### Summary of Changes
+In this project, AWS RDS with MySQL is chosen for several reasons:
 
-- Removed references to the local SQLite database.
-- Added instructions for setting up `initial_channels.txt` and `.env`.
-- Updated the need for AWS DynamoDB and appropriate credentials.
-- Simplified the setup instructions by leveraging example configuration files.
+1. **Simplicity:** MySQL provides a straightforward and widely-used database solution that integrates well with AWS services. Its SQL interface is familiar to many developers and easy to use for creating, querying, and managing data. 
+
+2. **Managed Service:** AWS RDS handles many operational aspects of database management, such as backups, patching, and scaling. This allows us to focus more on application development and less on database administration, leveraging the automation and reliability provided by AWS.
+
+3. **Testing Write/Read Traffic:** One of the goals of this project is to evaluate the database's performance under heavy write and read operations. By logging chat messages from multiple channels, we can assess the efficiency and throughput of the MySQL database on AWS RDS.
+
+These factors make AWS RDS with MySQL a suitable choice for this project, especially given its ease of use. As this is not a critical performance application, the simplicity and managed service capabilities of MySQL on RDS are ideal for our needs.
