@@ -1,16 +1,3 @@
-# import os
-# from dotenv import load_dotenv
-
-# load_dotenv()
-
-# CLIENT_ID = os.getenv('CLIENT_ID')
-# CLIENT_SECRET = os.getenv('CLIENT_SECRET')
-# REFRESH_TOKEN = os.getenv('REFRESH_TOKEN')
-# TOKEN_URL = 'https://id.twitch.tv/oauth2/token'
-# VALIDATION_URL = 'https://id.twitch.tv/oauth2/validate'
-# INITIAL_CHANNELS = os.getenv('INITIAL_CHANNELS').replace(' ','').split(',')
-# NICK = os.getenv('NICK')
-
 import os
 from dotenv import load_dotenv
 
@@ -19,10 +6,10 @@ load_dotenv()
 
 # Amazon Variables ---------------------------------------
 
-AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID')
-AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SECRET_ACCESS_KEY')
-AWS_REGION = os.getenv('AWS_REGION')
-DYNAMODB_TABLE_NAME = os.getenv('DYNAMODB_TABLE_NAME')
+RDS_HOST = os.getenv('RDS_HOST')
+RDS_DATABASE = os.getenv('RDS_DATABASE')
+RDS_USER = os.getenv('RDS_USER')
+RDS_PASSWORD = os.getenv('RDS_PASSWORD')
 
 
 # Twitch Variables ---------------------------------------

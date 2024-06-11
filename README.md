@@ -5,8 +5,7 @@ Twitch Chat Analyzer is a Python project that connects to the Twitch API, pulls 
 ## Features
 
 - Connects to Twitch API
-- Pulls chat logs and saves them to a SQLite database
-- Basic bot commands
+- Pulls chat logs and saves them to an AWS RDS MySQL database
 - Modular and extensible structure
 
 ## Project Structure
@@ -42,7 +41,7 @@ twitch-chat-analyzer/
 - Python 3.9.x
 - Twitch account and API credentials
 - [Twitch Token Generator](https://twitchtokengenerator.com/) (optional, for generating refresh tokens)
-- AWS account with DynamoDB
+- AWS account with RDS MySQL database
 
 ### Installation
 
@@ -75,6 +74,10 @@ twitch-chat-analyzer/
     REFRESH_TOKEN=[generated via get_refresh_token.py / can also be obtained with https://twitchtokengenerator.com/]
     INITIAL_CHANNELS=[channels you want to join, separated by comma]
     NICK=[your twitch nick]
+    RDS_HOST=[RDS Endpoint]
+    RDS_DATABASE=[RDS Database Name]
+    RDS_USER=[RDS Username]
+    RDS_PASSWORD=[RDS Password]
     ```
 
 5. **Create and configure the `initial_channels.txt` file**:
@@ -93,36 +96,60 @@ twitch-chat-analyzer/
     channel_3
     ```
 
-6. **Set up AWS DynamoDB**:
+6. **Set Up AWS RDS MySQL**:
 
-    Ensure you have an AWS account and set up DynamoDB. You will need to configure AWS credentials which can be stored in environment variables or use AWS IAM roles if deploying on AWS services.
+    1. Go to the [AWS Management Console](https://aws.amazon.com/console/).
+    2. Navigate to the RDS service and create a new MySQL instance.
+    3. Ensure you make note of your RDS endpoint, database name, username, and password.
+    4. Ensure the security group for your RDS instance allows inbound traffic on port `3306` from your local machine’s IP or the EC2 instance you will be using.
 
-    If using environment variables, ensure the following are set:
+7. **Create the Database**:
 
-    ```sh
-    AWS_ACCESS_KEY_ID=[Your AWS Access Key ID]
-    AWS_SECRET_ACCESS_KEY=[Your AWS Secret Access Key]
-    AWS_REGION=[Your AWS Region]
-    ```
-
-    Alternatively, configure your AWS credentials using the AWS CLI:
+    1. Connect to your RDS instance using a MySQL client:
 
     ```sh
-    aws configure
+    mysql -h your-rds-endpoint.amazonaws.com -u your-username -p
     ```
 
-6. **Run the application**:
+    2. Create the `twitch-log` database and the `twitch_chat` table:
 
-    Start the main application:
+    ```sql
+    CREATE DATABASE `twitch-log`;
+    USE `twitch-log`;
+    CREATE TABLE IF NOT EXISTS twitch_chat (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        channel_id VARCHAR(255) NOT NULL,
+        user_id VARCHAR(255) NOT NULL,
+        message TEXT NOT NULL,
+        timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+    ```
+
+8. **Run the application**:
+
+    To start logging Twitch chat messages, follow these steps:
+
+    1. Open your terminal or command prompt.
+    2. Activate the virtual environment with the following command:
 
     ```sh
-    python main.py
+    source venv/bin/activate  # On Windows use `venv\Scripts\activate`
     ```
+
+    3. Ensure your `.env` file and `initial_channels.txt` are properly configured.
+    4. Start the main application by running:
+
+    ```sh
+    python app/main.py
+    ```
+
+    This will start the bot and connect it to the Twitch API. It will begin logging chat messages from the specified channels into your RDS MySQL database.
+
 
 ### Scripts
 
-- `main.py`: Entry point of the application. Starts the bot.
-- `db_manager.py`: Contains DBManager class to connect to AWS DynamoDB and save messages.
+- `main.py`: Entry point of the application. Starts the bot and initializes database connections.
+- `db_manager.py`: CContains the DBManager class to connect to AWS RDS MySQL and save chat messages.
 - `auth_url.py`: Generates the authorization URL for Twitch API.
 - `get_refresh_token.py`: Script to obtain a refresh token using an authorization code.
 - `token_manager.py`: Contains functions to refresh and validate the access token.
